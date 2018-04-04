@@ -15,8 +15,8 @@ class Spider(RedisSpider):
     def parse(self, response):
         item = get_detail()
         info = response.xpath('//div[@class="p-parameter"]')
-        raw_name = response.xpath('//div[@class="sku-name"]/text()').extract()
-        item['name']  = ''.join(str(raw_name[-1]).split())
+        raw_name = str(response.xpath('//div[@class="sku-name"]/text()').extract()[0])
+        item['name']  = ''.join(raw_name.split())
         item['product_id']= response.url.split('/')[-1].split('.')[0]
         item['more_info'] = info.xpath('//ul[contains(@class, "parameter2")]/li/text()').extract()
         try:
