@@ -10,7 +10,7 @@
 
 
 2. 把每款手机的好评率按品牌分组聚合后得出的品牌综合好评率:
-![Figure_3.png](https://github.com/xuhaer/data_analysize/blob/master/Figure_2.png)
+![Figure_3.png](https://github.com/xuhaer/data_analysize/blob/master/Figure_3.png)
 
 3. 差评率排行:
 ![Figure_4.png](https://github.com/xuhaer/data_analysize/blob/master/Figure_4.png)
