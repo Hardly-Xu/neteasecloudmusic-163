@@ -5,37 +5,23 @@
     # 所有评论然后保存在数据库中的程序。
     # 歌单id(params)、目标用户user_id，以及数据库的写入可根据自己需求更改或注释掉。
 import base64
-import requests
 import json
 import time
 import random
 import threading
-import pymysql.cursors
+
+import requests
 from bs4 import BeautifulSoup
 from Crypto.Cipher import AES
 
-
-    #在mysql中创建数据库：create database netnease
-    #创建表'comments'：create table comments(id int unsigned not null auto_increment primary key, music_name varchar(64), music_id int unsigned, user_name varchar(32), user_id int unsigned, comments varchar(282),page int);
-    # 为了解决因emoji而出现string error时：ALTER TABLE comments CONVERT TO CHARACTER SET utf8mb4;
-    
-    # 连接mysql
-connection = pymysql.connect(host='localhost',
-                             user='root',
-                             password='123321',#你的数据库密码
-                             db='netease',     #连接的数据库名称
-                             charset='utf8mb4',
-                             port=3306,
-                             cursorclass=pymysql.cursors.DictCursor)
 
 s = requests.session()
     # 关闭默认的http connection的keep-alive
 s.keep_alive = False 
     # 为了解决错误max retries exceeded whith url
 requests.adapters.DEFAULT_RETRIES = 3
-
-    # 经我摸索，每次爬取时从proxies池中使用proxies不能解决出现的403错误、nginx等问题，
-    #而使用User-Agent后则不会出现错误。
+# 经我摸索，每次爬取时从proxies池中使用proxies不能解决出现的403错误、nginx等问题，
+#而使用User-Agent后则不会出现错误。
 user_agent_list = [
     "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_8; en-us) AppleWebKit/534.50 (KHTML, like Gecko) Version/5.1 Safari/534.50",
     "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-us) AppleWebKit/534.50 (KHTML, like Gecko) Version/5.1 Safari/534.50",
@@ -165,11 +151,11 @@ def get_the_first_half_comment(id,comments_sum,music_name):
                 page=-(comments_sum // 20 + 1 - raw_page)
                 #print(page)
                 # 添加目标用户评论的相关信息到到数据库中
-                with connection.cursor() as cursor:
-                    sql = "INSERT INTO `comments` ( `user_name`,`comments`,`music_name`,`music_id`,`page`) VALUES (%s,%s,%s,%s,%s)"
-                    cursor.execute(sql, (user_name,
-                        comment, music_name, id,page))
-                connection.commit() #提交数据库的更改
+                # with connection.cursor() as cursor:
+                #     sql = "INSERT INTO `comments` ( `user_name`,`comments`,`music_name`,`music_id`,`page`) VALUES (%s,%s,%s,%s,%s)"
+                #     cursor.execute(sql, (user_name,
+                #         comment, music_name, id,page))
+                # connection.commit() #提交数据库的更改
 
         raw_page += 1    
 
@@ -196,11 +182,11 @@ def get_the_second_half_comment(id,comments_sum,music_name):
                 page=-(comments_sum // 20 + 1 - raw_page)+half_page
                 print('《'+str(music_name)+'》'+'——'+':', comment,page)
                 #print(page)
-                with connection.cursor() as cursor:
-                    sql = "INSERT INTO `comments` ( `user_name`,`comments`,`music_name`,`music_id`,`page`) VALUES (%s,%s,%s,%s,%s)"
-                    cursor.execute(sql, (user_name,
-                        comment, music_name, id,page))
-                connection.commit() #提交数据库的更改
+                # with connection.cursor() as cursor:
+                #     sql = "INSERT INTO `comments` ( `user_name`,`comments`,`music_name`,`music_id`,`page`) VALUES (%s,%s,%s,%s,%s)"
+                #     cursor.execute(sql, (user_name,
+                #         comment, music_name, id,page))
+                # connection.commit() #提交数据库的更改
 
         raw_page += 1   
 

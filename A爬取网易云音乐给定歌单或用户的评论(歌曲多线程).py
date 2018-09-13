@@ -1,42 +1,34 @@
 # -*- coding: UTF-8 -*-
-
-    # 新手上路，不足之处还有很多，还望指教！
-    # 这是一个简陋地获取网易云音乐某歌单或者某专辑下的所有评论，并找出某个用户(user_id)在此歌单中的
-    # 所有评论然后保存在数据库中的程序。
-    # 编写环境:Ubuntu16.04、python3.5
-    # 歌单id(params)、目标用户user_id，以及数据库的写入可根据自己需求更改或注释掉。
+'''
+新手上路，不足之处还有很多，还望指教！
+这是一个简陋地获取网易云音乐某歌单或者某专辑下的所有评论，并找出某个用户(user_id)在此歌单中的所有评论然后保存在数据库中的程序。
+编写环境:Ubuntu16.04、python3.5
+歌单id(params)、目标用户user_id，以及数据库的写入可根据自己需求更改或注释掉。
+'''
 import base64
-import requests
 import json
 import time
 import random
 import threading
-import pymysql.cursors
+
+import requests
+
 from bs4 import BeautifulSoup
 from Crypto.Cipher import AES
 
 
-    #在mysql中创建数据库：create database netnease
-    #创建表'comments'：create table comments(id int unsigned not null auto_increment primary key, music_name varchar(64), music_id int unsigned, user_name varchar(32), user_id int unsigned, comments varchar(282),page int);
-    # 为了解决因emoji而出现string error时：ALTER TABLE comments CONVERT TO CHARACTER SET utf8mb4;
-    
-    # 连接mysql
-connection = pymysql.connect(host='localhost',
-                             user='root',
-                             password='123321',#你的数据库密码
-                             db='netease',     #连接的数据库名称
-                             charset='utf8mb4',
-                             port=3306,
-                             cursorclass=pymysql.cursors.DictCursor)
-
+''' 在mysql中创建数据库：create database netnease
+    创建表'comments'：create table comments(id int unsigned not null auto_increment     primary key, music_name varchar(64), music_id int unsigned, user_name          varchar(32), user_id int unsigned, comments varchar(282),page int);
+    为了解决因emoji而出现string error时：ALTER TABLE comments CONVERT TO CHARACTER SET utf8mb4;
+'''
 s = requests.session()
     # 关闭默认的http connection的keep-alive
 s.keep_alive = False 
     # 为了解决错误max retries exceeded whith url
 requests.adapters.DEFAULT_RETRIES = 3
 
-    # 经我摸索，每次爬取时从proxies池中使用proxies不能解决出现的403错误、nginx等问题，
-    # 而使用User-Agent后则不会出现错误。
+# 经我摸索，每次爬取时从proxies池中使用proxies不能解决出现的403错误、nginx等问题，
+# 而使用User-Agent后则不会出现错误。
 user_agent_list = [
     "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_8; en-us) AppleWebKit/534.50 (KHTML, like Gecko) Version/5.1 Safari/534.50",
     "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-us) AppleWebKit/534.50 (KHTML, like Gecko) Version/5.1 Safari/534.50",
@@ -64,8 +56,7 @@ user_agent_list = [
     "Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/535.24 (KHTML, like Gecko) Chrome/19.0.1055.1 Safari/535.24"
 ]
 
-
-user_agent = random.choice(user_agent_list)  # 随机获取代理ip
+user_agent = random.choice(user_agent_list)  # 随机获取agent
 raw_headers = {
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
     'Accept-Encoding': 'gzip, deflate, sdch',
@@ -116,10 +107,9 @@ def get_json(url, data):
     global index
     index += 1
     if index > 1500:
-        index -= 1500 # 每爬取约30000条评论sleep一下
-        print('每爬30000条评论,sleep几秒....ZZzzzzz......Go on')
+        index -= 1500 # 每爬取约1000条评论sleep一下
+        print('每爬1000条评论,sleep几秒....')
         time.sleep(random.randint(1, 3))
-
     return response.content
 
 
@@ -143,7 +133,6 @@ def crypt_api(music_id, offset):
 
 def get_comment(music_id,song_name):
     global num # 计量爬行总评论数
-
     #proxy_pool = raw_proxy_pool
     try:
         offset = 0
@@ -165,13 +154,11 @@ def get_comment(music_id,song_name):
             json_dict = json.loads(json_text.decode("utf-8"))
             json_comment = json_dict['comments']
             for comment in json_comment:
+
     # 每一个comment均为包含一个user的所有评论信息
     # 找了只有一条评论的歌曲信息，comment格式如下：
     # music_id:5283862 music_name:忘了我吧!我的最爱
-    #{"isMusician":false,"userId":-1,"topComments":[],"moreHot":false,"hotComments":[],"code":200,
-    #"comments":[{"user":{"locationInfo":null,"experts":null,"authStatus":0,"remarkName":null,"avatarUrl":"http://p1.music.126.net/8N882UcPox32hcrYCpfOxw==/19083123811686650.jpg","userId":429847262,"expertTags":null,"vipType":0,"nickname":"故事偷盗者","userType":0},
-    #"beReplied":[],"likedCount":0,"liked":false,"commentId":321330017,"time":1488441683356,"content":"为了遮羞才把书包挡住屁股给你学牛看，从此每天乐此不疲逗你开心。你初一的时候开始不好好学习，谈了男朋友，最后跟他私奔，现在都还杳无音讯！但不管怎样，我都希望你现在能像以前一样，找到那头可以逗你哈哈大笑的牛，幸福下去。晚安[牵手]",
-    #"isRemoveHotComment":false}],"total":1,"more":false}
+    # {"isMusician":false,"userId":-1,"topComments":[],"moreHot":false,"hotComments":[],"code":200,"comments":[{"user":{"locationInfo":null,"experts":null,"authStatus":0,"remarkName":null,"avatarUrl":"http://p1.music.126.net/8N882UcPox32hcrYCpfOxw==/19083123811686650.jpg","userId":429847262,"expertTags":null,"vipType":0,"nickname":"故事偷盗者","userType":0},"beReplied":[],"likedCount":0,"liked":false,"commentId":321330017,"time":1488441683356,"content":"为了遮羞才把书包挡住屁股给你学牛看，从此每天乐此不疲逗你开心。你初一的时候开始不好好学习，谈了男朋友，最后跟他私奔，现在都还杳无音讯！但不管怎样，我都希望你现在能像以前一样，找到那头可以逗你哈哈大笑的牛，幸福下去。晚安[牵手]","isRemoveHotComment":false}],"total":1,"more":false}
                 user_id = comment['user']['userId']
                  # 如果该歌曲中的评论有目标用户(user_id)则把目标用户的评论信息保存到数据库
                 if user_id == 48353:#网易UFO丁磊
@@ -183,10 +170,10 @@ def get_comment(music_id,song_name):
                     page=-(comments_sum // 20 + 1 - raw_page)
                     print(page)
                     # 添加目标用户评论的相关信息到到数据库中
-                    with connection.cursor() as cursor:
-                        sql = "INSERT INTO `whjbmk` (`music_name`, `music_id`,`user_name`,`comments`,`page`) VALUES (%s,%s,%s,%s,%s)"
-                        cursor.execute(sql, (song_name,music_id,user_name,comments,page))
-                    connection.commit() #提交数据库的更改
+                    # with connection.cursor() as cursor:
+                    #     sql = "INSERT INTO `whjbmk` (`music_name`, `music_id`,`user_name`,`comments`,`page`) VALUES (%s,%s,%s,%s,%s)"
+                    #     cursor.execute(sql, (song_name,music_id,user_name,comments,page))
+                    # connection.commit() #提交数据库的更改
             raw_page += 1
 
 
