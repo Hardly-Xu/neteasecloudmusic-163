@@ -5,11 +5,17 @@
 **2018年9月更新**: (若需最初我入门Python时的版本,请`ckeck out`至 `17d976a`)
 仅供学习入门参考, 为了不给服务器照成不良影响(而不是像版本1那样一秒几百条的爬取, 获取评论的时候每请求一次(获取一页评论) sleep 1 秒,所以,粗略估算效率不到20条(可能17 ,18吧)评论/秒.
 
+<br>
 
-
-
+<hr>
 
 **原README.md(2017年10月)**`git check out 17d976a`(慎用, 可能被反爬)
+
+这是以前爬取结果的示例图片:
+
+![实例图1](https://github.com/xuhaer/neteasecloudmusic-163/blob/master/1.jpeg)
+
+![实例图2](https://github.com/xuhaer/neteasecloudmusic-163/blob/master/2.jpeg)
 
 这是一个简陋的获取网易云音乐给定歌单的所有评论或找出特定用户在其歌单中的评论的程序。
 
