@@ -11,7 +11,7 @@
 
 **原README.md(2017年10月)**`git check out 17d976a`(慎用, 可能被反爬)
 
-这是以前爬取结果的示例图片:
+这是以前爬取结果的示例图片(室友作为小白鼠,感谢了):
 
 ![实例图1](https://github.com/xuhaer/neteasecloudmusic-163/blob/master/1.jpeg)
 
