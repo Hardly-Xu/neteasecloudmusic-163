@@ -104,3 +104,6 @@ ENV/
 .mypy_cache/
 
 .vscode/
+# 忽略
+.DS_Store
+__pycache__
